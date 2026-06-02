@@ -91,6 +91,7 @@ let audioContext;
 let analyser;
 let audioBuffer;
 let bufferSource;
+let mediaElementSource;
 let frequencyData;
 let isPlaying = false;
 let animationFrame;
@@ -132,7 +133,7 @@ const resizeVisualizer = () => {
   canvasContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 };
 
-const initAudio = async () => {
+const ensureAudioGraph = async () => {
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
 
   if (!AudioContextClass) {
@@ -150,6 +151,22 @@ const initAudio = async () => {
       analyser.connect(audioContext.destination);
     }
 
+    if (audioContext.state === "suspended") {
+      await audioContext.resume();
+    }
+
+    return audioContext.state === "running";
+  } catch (error) {
+    console.warn("Web Audio graph unavailable.", error);
+    audioContext = undefined;
+    analyser = undefined;
+    frequencyData = undefined;
+    return false;
+  }
+};
+
+const loadAudioBuffer = async () => {
+  try {
     if (!audioBuffer) {
       const response = await fetch(previewAudioUrl);
       const arrayBuffer = await response.arrayBuffer();
@@ -159,11 +176,66 @@ const initAudio = async () => {
     return true;
   } catch (error) {
     console.warn("Web Audio loop unavailable; falling back to HTML audio.", error);
-    audioContext = undefined;
-    analyser = undefined;
-    frequencyData = undefined;
     return false;
   }
+};
+
+const prefersNativeAudio = () =>
+  window.matchMedia?.("(hover: none) and (pointer: coarse)")?.matches ||
+  /Android|iPhone|iPad|iPod/i.test(window.navigator.userAgent);
+
+const startWebAudioLoop = async () => {
+  const hasAudioGraph = await ensureAudioGraph();
+
+  if (!hasAudioGraph || !audioContext || !analyser) {
+    return false;
+  }
+
+  const hasAudioBuffer = await loadAudioBuffer();
+
+  if (!hasAudioBuffer || !audioBuffer) {
+    return false;
+  }
+
+  previewAudio?.pause?.();
+  bufferSource?.stop?.();
+  bufferSource = audioContext.createBufferSource();
+  bufferSource.buffer = audioBuffer;
+  bufferSource.loop = true;
+  bufferSource.connect(analyser);
+  bufferSource.start();
+
+  return true;
+};
+
+const startHtmlAudioLoop = async ({ analyzeAudio = true } = {}) => {
+  if (!previewAudio || typeof previewAudio.play !== "function") {
+    return false;
+  }
+
+  bufferSource?.stop?.();
+  bufferSource = undefined;
+  previewAudio.currentTime = 0;
+  previewAudio.loop = true;
+
+  const playPromise = previewAudio.play();
+
+  if (analyzeAudio) {
+    try {
+      const hasAudioGraph = await ensureAudioGraph();
+
+      if (hasAudioGraph && audioContext && analyser && !mediaElementSource) {
+        mediaElementSource = audioContext.createMediaElementSource(previewAudio);
+        mediaElementSource.connect(analyser);
+      }
+    } catch (error) {
+      console.warn("Audio analysis unavailable; playing native audio only.", error);
+    }
+  }
+
+  await playPromise;
+
+  return !previewAudio.paused;
 };
 
 const setPlaying = async (nextPlaying) => {
@@ -181,22 +253,15 @@ const setPlaying = async (nextPlaying) => {
   }
 
   try {
-    const hasWebAudioLoop = await initAudio();
+    const useNativeAudio = prefersNativeAudio();
+    let didStart = useNativeAudio ? await startHtmlAudioLoop({ analyzeAudio: false }) : await startWebAudioLoop();
 
-    if (hasWebAudioLoop && audioContext && audioBuffer && analyser) {
-      if (audioContext.state === "suspended") {
-        await audioContext.resume();
-      }
+    if (!didStart) {
+      didStart = useNativeAudio ? await startWebAudioLoop() : await startHtmlAudioLoop();
+    }
 
-      bufferSource = audioContext.createBufferSource();
-      bufferSource.buffer = audioBuffer;
-      bufferSource.loop = true;
-      bufferSource.connect(analyser);
-      bufferSource.start();
-    } else if (previewAudio && typeof previewAudio.play === "function") {
-      await previewAudio.play();
-    } else {
-      console.warn("This browser does not expose audio playback APIs.");
+    if (!didStart) {
+      throw new Error("This browser does not expose audio playback APIs.");
     }
 
     isPlaying = true;
