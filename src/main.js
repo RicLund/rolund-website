@@ -3,34 +3,35 @@ import "./styles.css";
 const musicLinks = [
   {
     label: "Spotify",
-    url: "https://open.spotify.com/search/Rolund",
+    url: "https://open.spotify.com/search/Rolund%20Somewhere%20Between/albums",
   },
   {
     label: "Apple Music",
-    url: "https://music.apple.com/ca/artist/rolund/1868146719",
+    url: "https://music.apple.com/ca/album/somewhere-between/6773210957",
   },
   {
     label: "YouTube Music",
-    url: "https://music.youtube.com/search?q=Rolund",
+    url: "https://music.youtube.com/search?q=Rolund%20Somewhere%20Between",
   },
   {
     label: "Amazon Music",
-    url: "https://music.amazon.com/artists/B0GG79T6GY/rolund",
+    url: "https://music.amazon.com/search/Rolund+Somewhere+Between",
   },
   {
     label: "Deezer",
-    url: "https://www.deezer.com/artist/366866462",
+    url: "https://www.deezer.com/album/991229401",
   },
   {
     label: "TIDAL",
-    url: "https://listen.tidal.com/search?q=Rolund",
+    url: "https://listen.tidal.com/search?q=Rolund%20Somewhere%20Between",
   },
   {
     label: "Beatport",
-    url: "https://www.beatport.com/search?q=Rolund",
+    url: "https://www.beatport.com/search?q=Rolund%20Somewhere%20Between",
   },
 ];
 
+const releaseUrl = "https://music.apple.com/ca/album/somewhere-between/6773210957";
 const previewAudioUrl = "/website-loop4-gapless.wav";
 const makeWaveBars = () =>
   Array.from({ length: 9 }, (_, index) => `<i style="--i: ${index}"></i>`).join("");
@@ -38,7 +39,7 @@ const makeWaveBars = () =>
 document.querySelector("#app").innerHTML = `
   <canvas class="visualizer" aria-hidden="true"></canvas>
   <section class="profile" aria-labelledby="page-title">
-    <a class="portrait-link" href="${musicLinks[1].url}" target="_blank" rel="noopener noreferrer" aria-label="Open Rolund on Apple Music">
+    <a class="portrait-link" href="${releaseUrl}" target="_blank" rel="noopener noreferrer" aria-label="Open Somewhere Between on Apple Music">
       <span class="portrait-frame">
         <img class="portrait" src="/headshot.jpg" alt="Rolund headshot" width="512" height="512" />
         <span class="eye-glow eye-glow-left" aria-hidden="true"></span>
@@ -59,16 +60,51 @@ document.querySelector("#app").innerHTML = `
           `,
         )
         .join("")}
+      <button class="music-link contact-trigger" type="button">
+        <span>Contact</span>
+        <span class="wave" aria-hidden="true">${makeWaveBars()}</span>
+      </button>
     </nav>
 
     <button class="audio-toggle" type="button" aria-label="Play Rolund pulse preview" aria-pressed="false">
       <span class="play-icon" aria-hidden="true"></span>
       <span class="pause-icon" aria-hidden="true"></span>
     </button>
-    <p class="sample-note"><span>Feel Your Heart</span> on <span>Somewhere Between</span><br />available now</p>
+    <p class="sample-note">
+      <span>Feel Your Heart</span><br />
+      from <a href="${releaseUrl}" target="_blank" rel="noopener noreferrer">Somewhere Between</a><br />
+      available now
+    </p>
 
     <audio class="preview-audio" src="${previewAudioUrl}" preload="auto" loop></audio>
   </section>
+
+  <div class="contact-overlay" hidden>
+    <div class="contact-dialog" role="dialog" aria-modal="true" aria-labelledby="contact-title">
+      <button class="contact-close" type="button" aria-label="Close contact form">X</button>
+      <h2 id="contact-title">Contact Rolund</h2>
+      <form class="contact-form">
+        <label>
+          <span>Name</span>
+          <input name="name" type="text" autocomplete="name" required maxlength="80" />
+        </label>
+        <label>
+          <span>Email</span>
+          <input name="email" type="email" autocomplete="email" required maxlength="120" />
+        </label>
+        <label>
+          <span>Message</span>
+          <textarea name="message" rows="5" required maxlength="1400"></textarea>
+        </label>
+        <label class="contact-trap" aria-hidden="true">
+          <span>Website</span>
+          <input name="website" type="text" tabindex="-1" autocomplete="off" />
+        </label>
+        <button class="contact-submit" type="submit">Send</button>
+        <p class="contact-status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
 `;
 
 const portraitLink = document.querySelector(".portrait-link");
@@ -77,6 +113,11 @@ const audioToggle = document.querySelector(".audio-toggle");
 const visualizer = document.querySelector(".visualizer");
 const canvasContext = visualizer?.getContext("2d");
 const previewAudio = document.querySelector(".preview-audio");
+const contactTrigger = document.querySelector(".contact-trigger");
+const contactOverlay = document.querySelector(".contact-overlay");
+const contactClose = document.querySelector(".contact-close");
+const contactForm = document.querySelector(".contact-form");
+const contactStatus = document.querySelector(".contact-status");
 
 let audioContext;
 let analyser;
@@ -297,6 +338,72 @@ const drawVisualizer = (time = 0) => {
 window.addEventListener("resize", resizeVisualizer);
 audioToggle?.addEventListener("click", () => {
   setPlaying(!isPlaying);
+});
+
+const setContactOpen = (isOpen) => {
+  if (!contactOverlay) {
+    return;
+  }
+
+  contactOverlay.hidden = !isOpen;
+  document.body.classList.toggle("has-contact-open", isOpen);
+
+  if (isOpen) {
+    contactStatus.textContent = "";
+    contactForm?.querySelector("input[name='name']")?.focus();
+  } else {
+    contactTrigger?.focus();
+  }
+};
+
+contactTrigger?.addEventListener("click", () => setContactOpen(true));
+contactClose?.addEventListener("click", () => setContactOpen(false));
+contactOverlay?.addEventListener("click", (event) => {
+  if (event.target === contactOverlay) {
+    setContactOpen(false);
+  }
+});
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && contactOverlay && !contactOverlay.hidden) {
+    setContactOpen(false);
+  }
+});
+
+contactForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const formData = new FormData(contactForm);
+  const submitButton = contactForm.querySelector(".contact-submit");
+  const payload = {
+    name: String(formData.get("name") || "").trim(),
+    email: String(formData.get("email") || "").trim(),
+    message: String(formData.get("message") || "").trim(),
+    website: String(formData.get("website") || "").trim(),
+  };
+
+  submitButton.disabled = true;
+  contactStatus.textContent = "Sending...";
+
+  try {
+    const response = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(result.error || "Message could not be sent.");
+    }
+
+    contactForm.reset();
+    contactStatus.textContent = "Sent. Thanks for reaching out.";
+  } catch (error) {
+    contactStatus.textContent = error.message || "Message could not be sent.";
+  } finally {
+    submitButton.disabled = false;
+  }
 });
 
 resizeVisualizer();
