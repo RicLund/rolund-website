@@ -3,7 +3,7 @@ import "./styles.css";
 const musicLinks = [
   {
     label: "Spotify",
-    url: "https://open.spotify.com/search/Rolund%20Somewhere%20Between/albums",
+    url: "https://open.spotify.com/album/6qXwHXPs68xAqQkxjuOCih",
   },
   {
     label: "Apple Music",
@@ -23,11 +23,11 @@ const musicLinks = [
   },
   {
     label: "TIDAL",
-    url: "https://listen.tidal.com/search?q=Rolund%20Somewhere%20Between",
+    url: "https://tidal.com/album/527982714",
   },
   {
     label: "Beatport",
-    url: "https://www.beatport.com/search?q=Rolund%20Somewhere%20Between",
+    url: "https://www.beatport.com/release/somewhere-between/6983026",
   },
 ];
 
