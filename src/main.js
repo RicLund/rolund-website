@@ -65,7 +65,7 @@ document.querySelector("#app").innerHTML = `
       <span class="play-icon" aria-hidden="true"></span>
       <span class="pause-icon" aria-hidden="true"></span>
     </button>
-    <p class="sample-note"><span>Feel Your Heart</span> on <span>Somewhere Between</span> - available now</p>
+    <p class="sample-note"><span>Feel Your Heart</span> on <span>Somewhere Between</span><br />available now</p>
 
     <audio class="preview-audio" src="${previewAudioUrl}" preload="auto" loop></audio>
   </section>
