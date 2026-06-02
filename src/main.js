@@ -86,6 +86,8 @@ let isPlaying = false;
 let animationFrame;
 let haloTurn = 20;
 let lastVisualizerTime = 0;
+let bassBaseline = 0;
+let eyeBeatLevel = 0;
 
 if (previewAudio && typeof previewAudio.volume === "number") {
   previewAudio.volume = 0.82;
@@ -132,8 +134,8 @@ const initAudio = async () => {
       audioContext = new AudioContextClass();
       analyser = audioContext.createAnalyser();
 
-      analyser.fftSize = 64;
-      analyser.smoothingTimeConstant = 0.84;
+      analyser.fftSize = 512;
+      analyser.smoothingTimeConstant = 0.48;
       frequencyData = new Uint8Array(analyser.frequencyBinCount);
       analyser.connect(audioContext.destination);
     }
@@ -160,6 +162,8 @@ const setPlaying = async (nextPlaying) => {
     bufferSource = undefined;
     previewAudio?.pause?.();
     isPlaying = false;
+    eyeBeatLevel = 0;
+    bassBaseline = 0;
     profile?.classList.remove("is-playing");
     audioToggle?.setAttribute("aria-pressed", "false");
     audioToggle?.setAttribute("aria-label", "Play Rolund pulse preview");
@@ -186,6 +190,8 @@ const setPlaying = async (nextPlaying) => {
     }
 
     isPlaying = true;
+    eyeBeatLevel = 0;
+    bassBaseline = 0;
     profile?.classList.add("is-playing");
     audioToggle?.setAttribute("aria-pressed", "true");
     audioToggle?.setAttribute("aria-label", "Pause Rolund pulse preview");
@@ -219,6 +225,8 @@ const drawVisualizer = (time = 0) => {
   }
 
   const fallbackPulse = Math.sin(time * 0.008) * 0.5 + 0.5;
+  const elapsed = lastVisualizerTime ? Math.min(48, time - lastVisualizerTime) : 16;
+  lastVisualizerTime = time;
 
   for (let i = 0; i < barCount; i += 1) {
     const audioLevel = frequencyData?.[i % frequencyData.length] || 0;
@@ -246,17 +254,34 @@ const drawVisualizer = (time = 0) => {
       : fallbackPulse * 0.72
     : 0;
 
-  const eyePulse = isPlaying
-    ? frequencyData && analyser
-      ? Math.min(
-          1,
-          ((frequencyData[1] + frequencyData[2] + frequencyData[3] + frequencyData[4]) / (255 * 4)) ** 1.35,
-        )
-      : fallbackPulse * 0.5
-    : 0;
+  let eyePulse = 0;
 
-  const elapsed = lastVisualizerTime ? Math.min(48, time - lastVisualizerTime) : 16;
-  lastVisualizerTime = time;
+  if (isPlaying && frequencyData && analyser) {
+    const bassEnergy =
+      (frequencyData[1] * 1.12 +
+        frequencyData[2] * 1.08 +
+        frequencyData[3] * 0.88 +
+        frequencyData[4] * 0.58) /
+      (255 * 3.66);
+
+    if (!bassBaseline) {
+      bassBaseline = bassEnergy * 0.82;
+    }
+
+    const baselineRate = bassEnergy > bassBaseline ? 0.012 : 0.09;
+    bassBaseline += (bassEnergy - bassBaseline) * baselineRate;
+
+    const transient = Math.max(0, bassEnergy - bassBaseline * 1.04);
+    const beatHit = Math.min(1, transient * 7.2 + Math.max(0, bassEnergy - 0.52) * 0.55);
+    const decay = Math.exp(-elapsed / 92);
+    eyeBeatLevel = Math.max(beatHit, eyeBeatLevel * decay);
+    eyePulse = Math.min(1, eyeBeatLevel ** 0.82);
+  } else if (isPlaying) {
+    eyePulse = fallbackPulse * 0.5;
+  } else {
+    eyeBeatLevel = 0;
+    bassBaseline = 0;
+  }
 
   if (isPlaying) {
     haloTurn = (haloTurn + elapsed * (0.028 + eyePulse * 0.08)) % 360;
