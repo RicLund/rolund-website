@@ -99,6 +99,7 @@ let haloTurn = 20;
 let lastVisualizerTime = 0;
 let bassBaseline = 0;
 let eyeBeatLevel = 0;
+let playSessionId = 0;
 
 if (previewAudio && typeof previewAudio.volume === "number") {
   previewAudio.volume = 0.82;
@@ -184,7 +185,7 @@ const prefersNativeAudio = () =>
   window.matchMedia?.("(hover: none) and (pointer: coarse)")?.matches ||
   /Android|iPhone|iPad|iPod/i.test(window.navigator.userAgent);
 
-const startWebAudioLoop = async () => {
+const startWebAudioLoop = async ({ offset = 0, pauseNative = true } = {}) => {
   const hasAudioGraph = await ensureAudioGraph();
 
   if (!hasAudioGraph || !audioContext || !analyser) {
@@ -197,13 +198,16 @@ const startWebAudioLoop = async () => {
     return false;
   }
 
-  previewAudio?.pause?.();
   bufferSource?.stop?.();
   bufferSource = audioContext.createBufferSource();
   bufferSource.buffer = audioBuffer;
   bufferSource.loop = true;
   bufferSource.connect(analyser);
-  bufferSource.start();
+  bufferSource.start(0, audioBuffer.duration ? offset % audioBuffer.duration : 0);
+
+  if (pauseNative) {
+    previewAudio?.pause?.();
+  }
 
   return true;
 };
@@ -238,8 +242,23 @@ const startHtmlAudioLoop = async ({ analyzeAudio = true } = {}) => {
   return !previewAudio.paused;
 };
 
+const upgradeNativeLoopToWebAudio = async (sessionId) => {
+  if (!previewAudio) {
+    return;
+  }
+
+  const offset = previewAudio.currentTime || 0;
+  const didUpgrade = await startWebAudioLoop({ offset, pauseNative: true });
+
+  if (!didUpgrade || sessionId !== playSessionId || !isPlaying) {
+    bufferSource?.stop?.();
+    bufferSource = undefined;
+  }
+};
+
 const setPlaying = async (nextPlaying) => {
   if (!nextPlaying) {
+    playSessionId += 1;
     bufferSource?.stop?.();
     bufferSource = undefined;
     previewAudio?.pause?.();
@@ -253,6 +272,7 @@ const setPlaying = async (nextPlaying) => {
   }
 
   try {
+    const sessionId = playSessionId + 1;
     const useNativeAudio = prefersNativeAudio();
     let didStart = useNativeAudio ? await startHtmlAudioLoop({ analyzeAudio: false }) : await startWebAudioLoop();
 
@@ -264,14 +284,20 @@ const setPlaying = async (nextPlaying) => {
       throw new Error("This browser does not expose audio playback APIs.");
     }
 
+    playSessionId = sessionId;
     isPlaying = true;
     eyeBeatLevel = 0;
     bassBaseline = 0;
     profile?.classList.add("is-playing");
     audioToggle?.setAttribute("aria-pressed", "true");
     audioToggle?.setAttribute("aria-label", "Pause Rolund pulse preview");
+
+    if (useNativeAudio) {
+      upgradeNativeLoopToWebAudio(sessionId);
+    }
   } catch (error) {
     console.warn("Audio playback was blocked by the browser.", error);
+    playSessionId += 1;
     isPlaying = false;
     profile?.classList.remove("is-playing");
     audioToggle?.setAttribute("aria-pressed", "false");
