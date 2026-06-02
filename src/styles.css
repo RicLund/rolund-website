@@ -53,6 +53,7 @@ a {
 
 .profile {
   --audio-pulse: 0;
+  --eye-pulse: 0;
   position: relative;
   z-index: 1;
   isolation: isolate;
@@ -201,6 +202,37 @@ a {
 .portrait-link:hover .portrait,
 .portrait-link:focus-visible .portrait {
   transform: scale(1.08) rotate(-1.5deg);
+}
+
+.eye-glow {
+  position: absolute;
+  z-index: 3;
+  top: 42.5%;
+  width: 12.5%;
+  aspect-ratio: 1.75;
+  border-radius: 50%;
+  opacity: calc(var(--eye-pulse) * 0.7);
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(255, 242, 190, 0.95) 0 10%, rgba(255, 98, 52, 0.72) 22%, rgba(255, 59, 47, 0.18) 48%, transparent 72%),
+    radial-gradient(ellipse at 50% 50%, rgba(112, 226, 255, 0.42), transparent 62%);
+  box-shadow:
+    0 0 calc(5px + (var(--eye-pulse) * 10px)) rgba(255, 68, 45, calc(0.22 + (var(--eye-pulse) * 0.42))),
+    0 0 calc(11px + (var(--eye-pulse) * 18px)) rgba(104, 214, 255, calc(var(--eye-pulse) * 0.2));
+  filter: blur(2px) saturate(1.18);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(calc(0.72 + (var(--eye-pulse) * 0.38)));
+  transition:
+    opacity 70ms linear,
+    transform 70ms linear;
+}
+
+.eye-glow-left {
+  left: 40.5%;
+}
+
+.eye-glow-right {
+  left: 59.5%;
 }
 
 .profile.is-playing .portrait-frame {
@@ -459,6 +491,12 @@ h1 {
     box-shadow:
       0 14px 58px rgba(0, 0, 0, 0.72),
       0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  }
+
+  .eye-glow {
+    top: 42.3%;
+    width: 12%;
+    filter: blur(1.8px) saturate(1.16);
   }
 
   h1 {

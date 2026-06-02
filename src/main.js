@@ -41,6 +41,8 @@ document.querySelector("#app").innerHTML = `
     <a class="portrait-link" href="${musicLinks[1].url}" target="_blank" rel="noopener noreferrer" aria-label="Open Rolund on Apple Music">
       <span class="portrait-frame">
         <img class="portrait" src="/headshot.jpg" alt="Rolund headshot" width="512" height="512" />
+        <span class="eye-glow eye-glow-left" aria-hidden="true"></span>
+        <span class="eye-glow eye-glow-right" aria-hidden="true"></span>
       </span>
     </a>
 
@@ -241,7 +243,18 @@ const drawVisualizer = (time = 0) => {
       ? frequencyData[2] / 255
       : fallbackPulse * 0.72
     : 0;
+
+  const eyePulse = isPlaying
+    ? frequencyData && analyser
+      ? Math.min(
+          1,
+          ((frequencyData[1] + frequencyData[2] + frequencyData[3] + frequencyData[4]) / (255 * 4)) ** 1.35,
+        )
+      : fallbackPulse * 0.5
+    : 0;
+
   profile?.style.setProperty("--audio-pulse", glow.toFixed(3));
+  profile?.style.setProperty("--eye-pulse", eyePulse.toFixed(3));
   animationFrame = window.requestAnimationFrame(drawVisualizer);
 };
 
