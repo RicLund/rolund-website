@@ -118,6 +118,7 @@ const contactOverlay = document.querySelector(".contact-overlay");
 const contactClose = document.querySelector(".contact-close");
 const contactForm = document.querySelector(".contact-form");
 const contactStatus = document.querySelector(".contact-status");
+const contactEmail = "info@rolundmusic.com";
 
 let audioContext;
 let analyser;
@@ -356,6 +357,32 @@ const setContactOpen = (isOpen) => {
   }
 };
 
+const isLocalViteDev = () =>
+  ["127.0.0.1", "localhost"].includes(window.location.hostname) && window.location.port === "5173";
+
+const isValidContactEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+const makeContactMailto = ({ name, email, message }) => {
+  const subject = `Rolund website contact: ${name || "Hello"}`;
+  const body = [
+    `Name: ${name}`,
+    `Email: ${email}`,
+    "",
+    message,
+  ].join("\n");
+
+  return `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+};
+
+const showMailFallback = (payload, reason = "Email service is not available yet.") => {
+  const mailtoUrl = makeContactMailto(payload);
+  const link = document.createElement("a");
+  link.href = mailtoUrl;
+  link.textContent = `Email ${contactEmail}`;
+  contactStatus.textContent = `${reason} `;
+  contactStatus.append(link, ".");
+};
+
 contactTrigger?.addEventListener("click", () => setContactOpen(true));
 contactClose?.addEventListener("click", () => setContactOpen(false));
 contactOverlay?.addEventListener("click", (event) => {
@@ -382,10 +409,20 @@ contactForm?.addEventListener("submit", async (event) => {
     website: String(formData.get("website") || "").trim(),
   };
 
+  if (!payload.name || !isValidContactEmail(payload.email) || payload.message.length < 8) {
+    contactStatus.textContent = "Please include your name, email, and a short message.";
+    return;
+  }
+
   submitButton.disabled = true;
   contactStatus.textContent = "Sending...";
 
   try {
+    if (isLocalViteDev()) {
+      showMailFallback(payload, "Local preview cannot send the form.");
+      return;
+    }
+
     const response = await fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -397,10 +434,15 @@ contactForm?.addEventListener("submit", async (event) => {
       throw new Error(result.error || "Message could not be sent.");
     }
 
+    if (result.ok === false) {
+      showMailFallback(payload, result.error || "Email service is not available yet.");
+      return;
+    }
+
     contactForm.reset();
     contactStatus.textContent = "Sent. Thanks for reaching out.";
   } catch (error) {
-    contactStatus.textContent = error.message || "Message could not be sent.";
+    showMailFallback(payload, error.message || "Message could not be sent.");
   } finally {
     submitButton.disabled = false;
   }

@@ -689,6 +689,17 @@ h1 {
   text-align: center;
 }
 
+.contact-status a {
+  color: #fff9ed;
+  text-decoration: none;
+}
+
+.contact-status a:hover,
+.contact-status a:focus-visible {
+  text-decoration: underline;
+  outline: none;
+}
+
 @keyframes scan-shift {
   0% {
     transform: translate(-3px, -3px);

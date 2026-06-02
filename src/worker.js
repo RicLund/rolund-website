@@ -54,7 +54,7 @@ const handleContact = async (request, env) => {
   }
 
   if (!env.CONTACT_EMAIL || typeof env.CONTACT_EMAIL.send !== "function") {
-    return jsonResponse({ error: "Contact email is not configured yet." }, 503);
+    return jsonResponse({ ok: false, error: "Contact email is not configured yet." });
   }
 
   const subject = `Rolund website contact: ${name}`;
@@ -78,7 +78,7 @@ const handleContact = async (request, env) => {
     });
   } catch (error) {
     console.error("Contact email failed", error);
-    return jsonResponse({ error: "Message could not be sent." }, 502);
+    return jsonResponse({ ok: false, error: "Message could not be sent through the site." });
   }
 
   return jsonResponse({ ok: true });
