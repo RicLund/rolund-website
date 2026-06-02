@@ -448,9 +448,9 @@ h1 {
   justify-content: center;
   gap: 8px;
   place-items: center;
-  margin-top: -10px;
+  margin-top: -2px;
   padding: 0 14px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 249, 237, 0.36);
   border-radius: 999px;
   background:
     radial-gradient(circle at 42% 35%, rgba(255, 255, 255, 0.12), transparent 36%),
@@ -487,7 +487,7 @@ h1 {
 
 .contact-icon-button:hover,
 .contact-icon-button:focus-visible {
-  border-color: rgba(255, 255, 255, 0.42);
+  border-color: rgba(255, 249, 237, 0.72);
   color: #fff9ed;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.06) inset,
@@ -822,7 +822,7 @@ h1 {
 
   .contact-icon-button {
     min-height: 36px;
-    margin-top: -4px;
+    margin-top: 0;
     padding: 0 14px;
     font-size: 0.66rem;
     letter-spacing: 0.1em;
