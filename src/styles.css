@@ -409,6 +409,22 @@ h1 {
   display: block;
 }
 
+.sample-note {
+  max-width: min(100%, 360px);
+  margin: -10px 0 0;
+  color: rgba(245, 241, 232, 0.58);
+  font-size: 0.72rem;
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.sample-note span {
+  color: rgba(255, 249, 237, 0.9);
+}
+
 @keyframes scan-shift {
   0% {
     transform: translate(-3px, -3px);
@@ -531,6 +547,13 @@ h1 {
   .audio-toggle {
     width: 48px;
     margin-top: 3px;
+  }
+
+  .sample-note {
+    max-width: 260px;
+    margin-top: -6px;
+    font-size: clamp(0.62rem, 2.7vw, 0.68rem);
+    letter-spacing: 0.08em;
   }
 
   .play-icon {
