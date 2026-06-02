@@ -35,10 +35,6 @@ body {
     linear-gradient(180deg, #050505 0%, #000 45%, #030303 100%);
 }
 
-body.has-contact-open {
-  overflow: hidden;
-}
-
 a {
   color: inherit;
 }
@@ -462,6 +458,7 @@ h1 {
   font-weight: 760;
   letter-spacing: 0.12em;
   line-height: 1;
+  text-decoration: none;
   text-transform: uppercase;
   transition:
     border-color 160ms ease,
@@ -531,173 +528,6 @@ h1 {
 .mail-icon::after {
   right: -1px;
   transform: rotate(-34deg);
-}
-
-.contact-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 10;
-  display: grid;
-  place-items: center;
-  padding: 20px;
-  background:
-    radial-gradient(circle at 50% 42%, rgba(255, 70, 51, 0.14), transparent 28rem),
-    rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(14px);
-}
-
-.contact-overlay[hidden] {
-  display: none;
-}
-
-.contact-dialog {
-  position: relative;
-  width: min(100%, 430px);
-  padding: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 8px;
-  background:
-    linear-gradient(180deg, rgba(25, 12, 10, 0.94), rgba(5, 5, 5, 0.96)),
-    #070707;
-  box-shadow:
-    0 24px 80px rgba(0, 0, 0, 0.68),
-    0 0 42px rgba(255, 81, 63, 0.16);
-}
-
-.contact-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 34px;
-  aspect-ratio: 1;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.36);
-  color: rgba(255, 249, 237, 0.84);
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.78rem;
-  font-weight: 760;
-}
-
-.contact-close:hover,
-.contact-close:focus-visible {
-  border-color: rgba(255, 255, 255, 0.44);
-  color: #fff9ed;
-  outline: none;
-}
-
-.contact-dialog h2 {
-  margin: 0 42px 22px 0;
-  color: #fff9ed;
-  font-size: 1.2rem;
-  line-height: 1.1;
-  letter-spacing: 0;
-}
-
-.contact-form {
-  display: grid;
-  gap: 14px;
-}
-
-.contact-form label {
-  display: grid;
-  gap: 7px;
-}
-
-.contact-form label span {
-  color: rgba(245, 241, 232, 0.68);
-  font-size: 0.68rem;
-  font-weight: 720;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.contact-form input,
-.contact-form textarea {
-  width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.38);
-  color: #fff9ed;
-  font: inherit;
-  font-size: 0.95rem;
-  line-height: 1.4;
-  outline: none;
-}
-
-.contact-form input {
-  height: 42px;
-  padding: 0 12px;
-}
-
-.contact-form textarea {
-  min-height: 124px;
-  resize: vertical;
-  padding: 11px 12px;
-}
-
-.contact-form input:focus,
-.contact-form textarea:focus {
-  border-color: rgba(255, 211, 138, 0.68);
-  box-shadow: 0 0 0 3px rgba(255, 81, 63, 0.12);
-}
-
-.contact-trap {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-}
-
-.contact-submit {
-  min-height: 42px;
-  margin-top: 4px;
-  border: 1px solid rgba(255, 211, 138, 0.46);
-  border-radius: 999px;
-  background:
-    linear-gradient(90deg, rgba(255, 81, 63, 0.84), rgba(247, 197, 111, 0.88)),
-    #ff513f;
-  color: #120604;
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.contact-submit:hover,
-.contact-submit:focus-visible {
-  box-shadow: 0 0 30px rgba(255, 81, 63, 0.28);
-  outline: none;
-}
-
-.contact-submit:disabled {
-  cursor: progress;
-  opacity: 0.58;
-}
-
-.contact-status {
-  min-height: 1.3em;
-  margin: 0;
-  color: rgba(245, 241, 232, 0.68);
-  font-size: 0.82rem;
-  line-height: 1.35;
-  text-align: center;
-}
-
-.contact-status a {
-  color: #fff9ed;
-  text-decoration: none;
-}
-
-.contact-status a:hover,
-.contact-status a:focus-visible {
-  text-decoration: underline;
-  outline: none;
 }
 
 @keyframes scan-shift {
@@ -837,18 +667,6 @@ h1 {
     padding: 0 14px;
     font-size: 0.66rem;
     letter-spacing: 0.1em;
-  }
-
-  .contact-overlay {
-    align-items: center;
-    padding: 14px;
-  }
-
-  .contact-dialog {
-    width: 100%;
-    max-height: calc(100svh - 28px);
-    overflow: auto;
-    padding: 24px 20px 20px;
   }
 
   .play-icon {

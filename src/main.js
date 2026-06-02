@@ -71,40 +71,13 @@ document.querySelector("#app").innerHTML = `
       from <a href="${releaseUrl}" target="_blank" rel="noopener noreferrer">Somewhere Between</a><br />
       available now
     </p>
-    <button class="contact-trigger contact-icon-button" type="button" aria-label="Contact Rolund">
+    <a class="contact-icon-button" href="mailto:info@rolundmusic.com?subject=Rolund%20website%20contact" aria-label="Email Rolund">
       <span class="mail-icon" aria-hidden="true"></span>
       <span>Contact</span>
-    </button>
+    </a>
 
     <audio class="preview-audio" src="${previewAudioUrl}" preload="auto" loop></audio>
   </section>
-
-  <div class="contact-overlay" hidden>
-    <div class="contact-dialog" role="dialog" aria-modal="true" aria-labelledby="contact-title">
-      <button class="contact-close" type="button" aria-label="Close contact form">X</button>
-      <h2 id="contact-title">Contact Rolund</h2>
-      <form class="contact-form">
-        <label>
-          <span>Name</span>
-          <input name="name" type="text" autocomplete="name" required maxlength="80" />
-        </label>
-        <label>
-          <span>Email</span>
-          <input name="email" type="email" autocomplete="email" required maxlength="120" />
-        </label>
-        <label>
-          <span>Message</span>
-          <textarea name="message" rows="5" required maxlength="1400"></textarea>
-        </label>
-        <label class="contact-trap" aria-hidden="true">
-          <span>Website</span>
-          <input name="website" type="text" tabindex="-1" autocomplete="off" />
-        </label>
-        <button class="contact-submit" type="submit">Send</button>
-        <p class="contact-status" role="status" aria-live="polite"></p>
-      </form>
-    </div>
-  </div>
 `;
 
 const portraitLink = document.querySelector(".portrait-link");
@@ -113,12 +86,6 @@ const audioToggle = document.querySelector(".audio-toggle");
 const visualizer = document.querySelector(".visualizer");
 const canvasContext = visualizer?.getContext("2d");
 const previewAudio = document.querySelector(".preview-audio");
-const contactTrigger = document.querySelector(".contact-trigger");
-const contactOverlay = document.querySelector(".contact-overlay");
-const contactClose = document.querySelector(".contact-close");
-const contactForm = document.querySelector(".contact-form");
-const contactStatus = document.querySelector(".contact-status");
-const contactEmail = "info@rolundmusic.com";
 
 let audioContext;
 let analyser;
@@ -339,113 +306,6 @@ const drawVisualizer = (time = 0) => {
 window.addEventListener("resize", resizeVisualizer);
 audioToggle?.addEventListener("click", () => {
   setPlaying(!isPlaying);
-});
-
-const setContactOpen = (isOpen) => {
-  if (!contactOverlay) {
-    return;
-  }
-
-  contactOverlay.hidden = !isOpen;
-  document.body.classList.toggle("has-contact-open", isOpen);
-
-  if (isOpen) {
-    contactStatus.textContent = "";
-    contactForm?.querySelector("input[name='name']")?.focus();
-  } else {
-    contactTrigger?.focus();
-  }
-};
-
-const isLocalViteDev = () =>
-  ["127.0.0.1", "localhost"].includes(window.location.hostname) && window.location.port === "5173";
-
-const isValidContactEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-
-const makeContactMailto = ({ name, email, message }) => {
-  const subject = `Rolund website contact: ${name || "Hello"}`;
-  const body = [
-    `Name: ${name}`,
-    `Email: ${email}`,
-    "",
-    message,
-  ].join("\n");
-
-  return `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-};
-
-const showMailFallback = (payload, reason = "Email service is not available yet.") => {
-  const mailtoUrl = makeContactMailto(payload);
-  const link = document.createElement("a");
-  link.href = mailtoUrl;
-  link.textContent = `Email ${contactEmail}`;
-  contactStatus.textContent = `${reason} `;
-  contactStatus.append(link, ".");
-};
-
-contactTrigger?.addEventListener("click", () => setContactOpen(true));
-contactClose?.addEventListener("click", () => setContactOpen(false));
-contactOverlay?.addEventListener("click", (event) => {
-  if (event.target === contactOverlay) {
-    setContactOpen(false);
-  }
-});
-
-window.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && contactOverlay && !contactOverlay.hidden) {
-    setContactOpen(false);
-  }
-});
-
-contactForm?.addEventListener("submit", async (event) => {
-  event.preventDefault();
-
-  const formData = new FormData(contactForm);
-  const submitButton = contactForm.querySelector(".contact-submit");
-  const payload = {
-    name: String(formData.get("name") || "").trim(),
-    email: String(formData.get("email") || "").trim(),
-    message: String(formData.get("message") || "").trim(),
-    website: String(formData.get("website") || "").trim(),
-  };
-
-  if (!payload.name || !isValidContactEmail(payload.email) || payload.message.length < 8) {
-    contactStatus.textContent = "Please include your name, email, and a short message.";
-    return;
-  }
-
-  submitButton.disabled = true;
-  contactStatus.textContent = "Sending...";
-
-  try {
-    if (isLocalViteDev()) {
-      showMailFallback(payload, "Local preview cannot send the form.");
-      return;
-    }
-
-    const response = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const result = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      throw new Error(result.error || "Message could not be sent.");
-    }
-
-    if (result.ok === false) {
-      showMailFallback(payload, result.error || "Email service is not available yet.");
-      return;
-    }
-
-    contactForm.reset();
-    contactStatus.textContent = "Sent. Thanks for reaching out.";
-  } catch (error) {
-    showMailFallback(payload, error.message || "Message could not be sent.");
-  } finally {
-    submitButton.disabled = false;
-  }
 });
 
 resizeVisualizer();

@@ -31,8 +31,4 @@ The included `wrangler.jsonc` also supports deploying through Workers Static Ass
 npm run deploy
 ```
 
-The contact form uses Cloudflare Email Service through the `CONTACT_EMAIL` binding.
-Before the form can send live messages, enable Email Sending for `rolundmusic.com`
-in Cloudflare and verify `info@rolundmusic.com` as a sender/destination.
-
 Update music platform URLs in `src/main.js`.

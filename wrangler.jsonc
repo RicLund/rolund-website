@@ -1,19 +1,9 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "rolund-website",
-  "main": "./src/worker.js",
   "compatibility_date": "2026-06-01",
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application"
-  },
-  "send_email": [
-    {
-      "name": "CONTACT_EMAIL",
-      "destination_address": "info@rolundmusic.com",
-      "allowed_sender_addresses": [
-        "info@rolundmusic.com"
-      ]
-    }
-  ]
+  }
 }
