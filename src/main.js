@@ -60,10 +60,6 @@ document.querySelector("#app").innerHTML = `
           `,
         )
         .join("")}
-      <button class="music-link contact-trigger" type="button">
-        <span>Contact</span>
-        <span class="wave" aria-hidden="true">${makeWaveBars()}</span>
-      </button>
     </nav>
 
     <button class="audio-toggle" type="button" aria-label="Play Rolund pulse preview" aria-pressed="false">
@@ -75,6 +71,9 @@ document.querySelector("#app").innerHTML = `
       from <a href="${releaseUrl}" target="_blank" rel="noopener noreferrer">Somewhere Between</a><br />
       available now
     </p>
+    <button class="contact-trigger contact-icon-button" type="button" aria-label="Contact Rolund">
+      <span class="mail-icon" aria-hidden="true"></span>
+    </button>
 
     <audio class="preview-audio" src="${previewAudioUrl}" preload="auto" loop></audio>
   </section>

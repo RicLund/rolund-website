@@ -290,13 +290,6 @@ h1 {
     transform 160ms ease;
 }
 
-button.music-link {
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  font: inherit;
-}
-
 .music-link::after {
   display: none;
 }
@@ -445,6 +438,89 @@ button.music-link {
 .sample-note a:focus-visible {
   color: #fff9ed;
   outline: none;
+}
+
+.contact-icon-button {
+  position: relative;
+  width: 34px;
+  aspect-ratio: 1;
+  display: inline-grid;
+  place-items: center;
+  margin-top: -12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 42% 35%, rgba(255, 255, 255, 0.12), transparent 36%),
+    rgba(0, 0, 0, 0.34);
+  color: rgba(245, 241, 232, 0.66);
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.contact-icon-button::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: inherit;
+  opacity: 0;
+  background: conic-gradient(from 30deg, #ff513f, #f7c56f, #65d8ff, #ff513f);
+  filter: blur(8px);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+  transform: scale(0.8);
+  z-index: -1;
+}
+
+.contact-icon-button:hover,
+.contact-icon-button:focus-visible {
+  border-color: rgba(255, 255, 255, 0.42);
+  color: #fff9ed;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 0 24px rgba(255, 81, 63, 0.18);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.contact-icon-button:hover::before,
+.contact-icon-button:focus-visible::before {
+  opacity: 0.42;
+  transform: scale(1);
+}
+
+.mail-icon {
+  position: relative;
+  z-index: 1;
+  width: 16px;
+  height: 11px;
+  border: 1.8px solid currentColor;
+  border-radius: 2px;
+}
+
+.mail-icon::before,
+.mail-icon::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  width: 10px;
+  height: 1.8px;
+  background: currentColor;
+  transform-origin: 50% 50%;
+}
+
+.mail-icon::before {
+  left: -1px;
+  transform: rotate(34deg);
+}
+
+.mail-icon::after {
+  right: -1px;
+  transform: rotate(-34deg);
 }
 
 .contact-overlay {
@@ -732,6 +808,11 @@ button.music-link {
     margin-top: -6px;
     font-size: clamp(0.62rem, 2.7vw, 0.68rem);
     letter-spacing: 0.08em;
+  }
+
+  .contact-icon-button {
+    width: 36px;
+    margin-top: -7px;
   }
 
   .contact-overlay {
