@@ -54,6 +54,7 @@ a {
 .profile {
   --audio-pulse: 0;
   --eye-pulse: 0;
+  --halo-angle: 20deg;
   position: relative;
   z-index: 1;
   isolation: isolate;
@@ -123,10 +124,22 @@ a {
 
 .portrait-link::before {
   background:
-    radial-gradient(circle at var(--glow-x) var(--glow-y), rgba(255, 221, 142, 0.7), transparent 28%),
-    conic-gradient(from 20deg, #ff4633, #ffd38a, #6ee7f9, #e862ff, #ff4633);
-  filter: blur(14px);
-  transform: scale(0.92);
+    radial-gradient(circle at var(--glow-x) var(--glow-y), rgba(255, 221, 142, 0.45), transparent 28%),
+    conic-gradient(
+      from var(--halo-angle),
+      transparent 0deg,
+      rgba(255, 70, 51, 0.06) 34deg,
+      rgba(255, 211, 138, 0.92) 58deg,
+      rgba(255, 70, 51, 0.28) 86deg,
+      transparent 124deg,
+      transparent 190deg,
+      rgba(104, 214, 255, 0.58) 224deg,
+      rgba(232, 98, 255, 0.28) 252deg,
+      transparent 292deg,
+      transparent 360deg
+    );
+  filter: blur(15px);
+  transform: scale(calc(0.94 + (var(--audio-pulse) * 0.12)));
 }
 
 .portrait-link::after {
@@ -147,8 +160,8 @@ a {
 .portrait-link:hover::before,
 .portrait-link:focus-visible::before,
 .profile.is-playing .portrait-link::before {
-  opacity: 0.55;
-  transform: scale(1.03);
+  opacity: calc(0.34 + (var(--audio-pulse) * 0.34));
+  transform: scale(calc(1.01 + (var(--audio-pulse) * 0.14)));
 }
 
 .portrait-link:hover::after,
@@ -233,10 +246,6 @@ a {
 
 .eye-glow-right {
   left: 59.5%;
-}
-
-.profile.is-playing .portrait-frame {
-  animation: pulse-ring 980ms ease-in-out infinite;
 }
 
 h1 {
@@ -414,22 +423,6 @@ h1 {
   }
 }
 
-@keyframes pulse-ring {
-  0%,
-  100% {
-    box-shadow:
-      0 18px 80px rgba(0, 0, 0, 0.72),
-      0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-  }
-
-  50% {
-    box-shadow:
-      0 20px 90px rgba(0, 0, 0, 0.68),
-      0 0 34px rgba(255, 81, 63, 0.42),
-      0 0 0 1px rgba(255, 255, 255, 0.12) inset;
-  }
-}
-
 @keyframes link-wave {
   0%,
   100% {
@@ -479,8 +472,6 @@ h1 {
 
   .portrait-link::before {
     inset: -8px;
-    opacity: 0.34;
-    transform: scale(0.98);
   }
 
   .portrait-link::after {

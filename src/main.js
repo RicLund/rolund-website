@@ -84,6 +84,8 @@ let bufferSource;
 let frequencyData;
 let isPlaying = false;
 let animationFrame;
+let haloTurn = 20;
+let lastVisualizerTime = 0;
 
 if (previewAudio && typeof previewAudio.volume === "number") {
   previewAudio.volume = 0.82;
@@ -253,8 +255,16 @@ const drawVisualizer = (time = 0) => {
       : fallbackPulse * 0.5
     : 0;
 
+  const elapsed = lastVisualizerTime ? Math.min(48, time - lastVisualizerTime) : 16;
+  lastVisualizerTime = time;
+
+  if (isPlaying) {
+    haloTurn = (haloTurn + elapsed * (0.028 + eyePulse * 0.08)) % 360;
+  }
+
   profile?.style.setProperty("--audio-pulse", glow.toFixed(3));
   profile?.style.setProperty("--eye-pulse", eyePulse.toFixed(3));
+  profile?.style.setProperty("--halo-angle", `${haloTurn.toFixed(2)}deg`);
   animationFrame = window.requestAnimationFrame(drawVisualizer);
 };
 
