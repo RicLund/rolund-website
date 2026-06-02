@@ -442,18 +442,27 @@ h1 {
 
 .contact-icon-button {
   position: relative;
-  width: 34px;
-  aspect-ratio: 1;
-  display: inline-grid;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   place-items: center;
-  margin-top: -12px;
+  margin-top: -10px;
+  padding: 0 14px;
   border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 50%;
+  border-radius: 999px;
   background:
     radial-gradient(circle at 42% 35%, rgba(255, 255, 255, 0.12), transparent 36%),
     rgba(0, 0, 0, 0.34);
   color: rgba(245, 241, 232, 0.66);
   cursor: pointer;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 760;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
   transition:
     border-color 160ms ease,
     color 160ms ease,
@@ -495,6 +504,7 @@ h1 {
 
 .mail-icon {
   position: relative;
+  flex: 0 0 auto;
   z-index: 1;
   width: 16px;
   height: 11px;
@@ -811,8 +821,11 @@ h1 {
   }
 
   .contact-icon-button {
-    width: 36px;
-    margin-top: -7px;
+    min-height: 36px;
+    margin-top: -4px;
+    padding: 0 14px;
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
   }
 
   .contact-overlay {

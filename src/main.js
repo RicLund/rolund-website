@@ -73,6 +73,7 @@ document.querySelector("#app").innerHTML = `
     </p>
     <button class="contact-trigger contact-icon-button" type="button" aria-label="Contact Rolund">
       <span class="mail-icon" aria-hidden="true"></span>
+      <span>Contact</span>
     </button>
 
     <audio class="preview-audio" src="${previewAudioUrl}" preload="auto" loop></audio>
