@@ -18,10 +18,6 @@ const musicLinks = [
     url: "https://music.amazon.com/search/Rolund+Somewhere+Between",
   },
   {
-    label: "Deezer",
-    url: "https://www.deezer.com/album/991229401",
-  },
-  {
     label: "TIDAL",
     url: "https://tidal.com/album/527982714",
   },
